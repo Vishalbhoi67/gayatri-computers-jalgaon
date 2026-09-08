@@ -61,7 +61,7 @@ Admin Control: The store administrator logs into the secure admin panel (admin.h
 
 5. Configure Firebase:
 
-Add your respective Firebase credentials inside js/firebase-config.js to connect the database and authentication features.
+  Add your respective Firebase credentials inside js/firebase-config.js to connect the database and authentication features.
 
 ## 🔒 Security Note
 Sensitive configuration files (such as firebase-config.js) containing database keys are handled securely and excluded from public version control using .gitignore.
