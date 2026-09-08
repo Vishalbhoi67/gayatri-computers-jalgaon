@@ -46,5 +46,22 @@ Service Support & Tracking: Customers who submit a computer for repair receive a
 
 Admin Control: The store administrator logs into the secure admin panel (admin.html) to update service progress, manage incoming tickets, and handle inventory logs stored securely in the Firebase database.
 
+## Clone the repository
+
+1. **Clone the repository:**
+   ```bash
+   git clone [https://github.com/Vishalbhoi67/gayatri-computers-jalgaon.git](https://github.com/Vishalbhoi67/gayatri-computers-jalgaon.git)
+   cd gayatri-computers-jalgaon
+   ```
+2. Open with Local Environment:
+
+3. Open the project folder in VS Code.
+
+4. Run the project using the Live Server extension in your browser.
+
+5. Configure Firebase:
+
+Add your respective Firebase credentials inside js/firebase-config.js to connect the database and authentication features.
+
 ## 🔒 Security Note
 Sensitive configuration files (such as firebase-config.js) containing database keys are handled securely and excluded from public version control using .gitignore.
