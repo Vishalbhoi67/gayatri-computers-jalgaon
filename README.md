@@ -35,6 +35,7 @@ gayatri-computers/
 ├── js/                 # JavaScript logic (app.js, admin.js, products.js, etc.)
 ├── assets/             # Images, banners, and product graphics
 └── firebase.json       # Firebase hosting configuration
+```
 
 ## ⚙️ How It Works / Working Flow
 User Exploration: Visitors land on the Home page (index.html), where they can explore featured hardware items and company services.
