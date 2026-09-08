@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Book computer, laptop, printer, or CCTV repair service at Gayatri Computers Jalgaon. Get instant Query Reference ID.">
+  <title>Book Service & Repair | Gayatri Computers Jalgaon</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Firebase 9.23.0 Compat SDK & Firestore Storage Adapter -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="products.html" class="nav-link">Products</a>
+        <a href="services.html" class="nav-link active">Services</a>
+        <a href="track.html" class="nav-link">Track Query / Order</a>
+        <a href="contact.html" class="nav-link">Contact Us</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="admin.html" class="admin-btn">
+          <i class="fas fa-user-shield"></i> Admin Login
+        </a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Booking Form Section -->
+  <section class="section-padding services-main-section" style="padding-top: 100px;">
+    <div class="container" style="max-width: 850px;">
+      
+      <!-- Booking Form Details -->
+      <div class="form-card">
+        <h3 style="margin-bottom: 1.5rem; font-size: 1.25rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fas fa-clipboard-list" style="color: var(--primary-blue);"></i> Customer & Equipment Details
+        </h3>
+
+        <form id="serviceBookingForm">
+          <div class="form-group">
+            <label class="form-label" for="deviceTypeInput">Select Device / Service Type *</label>
+            <select id="deviceTypeInput" class="form-control" required>
+              <option value="" disabled selected>-- Choose Service / Device --</option>
+              <option value="Laptop Repair & Chip-Level Maintenance">Laptop Repair & Chip-Level Maintenance</option>
+              <option value="Desktop PC Diagnostic & Repair">Desktop PC Diagnostic & Repair</option>
+              <option value="Printer / Inkjet Refill & Service">Printer / Inkjet Refill & Service</option>
+              <option value="CCTV System & Security Installation">CCTV System & Security Installation</option>
+              <option value="Other Computer Hardware Issue">Other Computer Hardware Issue</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="form-group">
+              <label class="form-label" for="srvCustName">Customer Full Name *</label>
+              <input type="text" id="srvCustName" class="form-control" placeholder="e.g. Ramesh Patil" required />
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="srvCustPhone">Mobile Number (WhatsApp) *</label>
+              <input type="tel" id="srvCustPhone" class="form-control" placeholder="e.g. 9823012345" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="srvDeviceBrand">Device Brand & Model Number</label>
+            <input type="text" id="srvDeviceBrand" class="form-control" placeholder="e.g. HP Pavilion 15 / Epson L3210 / CP Plus DVR" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="srvIssueDesc">Problem / Issue Description *</label>
+            <textarea id="srvIssueDesc" class="form-control" placeholder="Describe the exact fault (e.g. No power, display flickering, printer error code, camera offline)..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-full" style="padding: 0.9rem; font-size: 1.05rem; margin-top: 1rem;">
+            <i class="fas fa-paper-plane"></i> Book Service & Get Query ID
+          </button>
+        </form>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Query Generated Success Modal -->
+  <div class="modal-backdrop" id="serviceSuccessModal" style="display: none;" onclick="if(event.target === this) { const m = document.getElementById('serviceSuccessModal'); if(m) { m.style.display='none'; m.classList.remove('active'); } }">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #4ADE80 !important;"><i class="fas fa-check-circle"></i> Service Ticket Registered!</h3>
+        <button type="button" class="modal-close"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <p style="color: #CBD5E1; font-size: 0.85rem; line-height: 1.4; margin-bottom: 0.85rem;">
+          Your service request has been logged successfully at Gayatri Computers.
+        </p>
+        
+        <!-- Digital Ticket Coupon Box -->
+        <div class="digital-ticket-box">
+          <span>UNIQUE QUERY REFERENCE ID</span>
+          <h2 id="resQueryId">GC-SRV-XXXX</h2>
+          <button type="button" id="copyQueryIdBtn" class="btn btn-secondary btn-sm">
+            <i class="fas fa-copy"></i> Copy Query ID
+          </button>
+        </div>
+
+        <!-- Customer & Device Summary Card -->
+        <div class="srv-summary-card" style="text-align: left; font-size: 0.9rem; margin-bottom: 1.25rem; padding: 0.85rem 1rem;">
+          <p style="margin-bottom: 0.35rem;"><strong>Customer:</strong> <span id="resCustName">---</span></p>
+          <p style="margin: 0;"><strong>Device:</strong> <span id="resDevice">---</span></p>
+        </div>
+
+        <!-- Action Button -->
+        <div style="display: flex; width: 100%;">
+          <a href="track.html" id="directTrackBtn" class="btn btn-primary btn-full">
+            <i class="fas fa-search"></i> Track Live Status Now
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/services.js"></script>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Gayatri Computers Sales & Service - Your Trusted Partner for Laptop, Desktop, Printer & CCTV Repairs in Golani Market, Jalgaon. Contact: 9226958825.">
+  <title>Gayatri Computers | Sales & Service Center in Jalgaon</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- CSS Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/jpeg" href="assets/Logo.jpeg">
+
+  <!-- Firebase 9.23.0 Compat SDK & Firestore Storage Adapter -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- Transparent Floating Navbar Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="products.html" class="nav-link">Products</a>
+        <a href="services.html" class="nav-link">Services</a>
+        <a href="track.html" class="nav-link">Track Query / Order</a>
+        <a href="contact.html" class="nav-link">Contact Us</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="admin.html" class="admin-btn">
+          <i class="fas fa-user-shield"></i> Admin Login
+        </a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Navigation Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Full-Width 10-Image Cross-Fade Slideshow Hero Section -->
+  <section class="hero-slider-section">
+    <!-- Brand Logo Overlay (Positioned Top-Left of Hero Section) -->
+    <div class="container hero-brand-wrapper">
+      <div class="hero-brand-overlay hero-brand-box hero-branding-badge">
+        <a href="index.html" class="logo-brand">
+          <div class="brand-logo-img-wrapper">
+            <img src="assets/Logo.jpeg" alt="Gayatri Computers Logo" class="brand-logo-img">
+          </div>
+          <div class="logo-text" style="color: #ffffff;">
+            Gayatri <span style="color: #ffffff;">Computers</span>
+            <span class="logo-sub" style="color: #ffffff;">SALES & SERVICE CENTER</span>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="hero-slider-container" id="heroSlider">
+      <!-- 10 Image Slides -->
+      <div class="hero-slide active">
+        <img src="assets/hero_banner.jpg" alt="Custom PC Builds & Hardware" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/cat_motherboard.jpg" alt="Laptop Chip-Level Repair Station" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/cat_cctv.jpg" alt="Printers & Toner Cartridges" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/hero-bg4.jpg" alt="CCTV & Smart Surveillance Systems" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/hero-bg5.jpg" alt="Gaming Motherboards & RAM/SSDs" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/hero-bg6.jpg" alt="Mechanical Keyboards & RGB Mice" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/hero-bg7.jpg" alt="SMPS Power Supplies & Cabinets" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/hero_banner.jpg" alt="External SSDs & USB Hubs" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/cat_motherboard.jpg" alt="Ultra-Wide LED Monitors" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+      <div class="hero-slide">
+        <img src="assets/cat_cctv.jpg" alt="WiFi Routers & Networking Gear" class="hero-slide-img">
+        <div class="hero-slide-overlay"></div>
+      </div>
+
+      <!-- Navigation Arrows -->
+      <button class="slider-arrow prev-arrow" id="heroPrevBtn" aria-label="Previous Slide">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <button class="slider-arrow next-arrow" id="heroNextBtn" aria-label="Next Slide">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- 10 Pagination Dots Indicators -->
+      <div class="slider-dots" id="heroDotsContainer">
+        <span class="slider-dot active" data-slide="0"></span>
+        <span class="slider-dot" data-slide="1"></span>
+        <span class="slider-dot" data-slide="2"></span>
+        <span class="slider-dot" data-slide="3"></span>
+        <span class="slider-dot" data-slide="4"></span>
+        <span class="slider-dot" data-slide="5"></span>
+        <span class="slider-dot" data-slide="6"></span>
+        <span class="slider-dot" data-slide="7"></span>
+        <span class="slider-dot" data-slide="8"></span>
+        <span class="slider-dot" data-slide="9"></span>
+      </div>
+
+      <!-- Mobile Scroll Down Prompt Indicator -->
+      <a href="#featured-catalog" class="mobile-scroll-indicator" aria-label="Scroll to Catalog">
+        <span class="scroll-text">Scroll Down</span>
+        <i class="fas fa-chevron-down scroll-arrow"></i>
+      </a>
+    </div>
+  </section>
+
+  <!-- Featured Categories Marquee Auto-Slider Section -->
+  <section id="featured-catalog" class="section-padding category-marquee-section">
+    <div class="container text-center">
+      <span class="section-tag" style="color: #38BDF8; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);">Sales Catalog</span>
+      <h2 class="section-title">Explore Featured Categories</h2>
+      <p class="section-subtitle">Top quality hardware, power supplies, security cameras, and computer accessories at the best rates in Golani Market.</p>
+    </div>
+
+    <div class="category-marquee-wrapper">
+      <div class="category-marquee-track">
+        <!-- 6 Original Category Cards -->
+        <a href="products.html?cat=Printers" class="category-card">
+          <div class="category-icon"><i class="fas fa-print"></i></div>
+          <h3 class="category-name">Printers & Accessories</h3>
+        </a>
+
+        <a href="products.html?cat=Motherboards" class="category-card">
+          <div class="category-icon"><i class="fas fa-microchip"></i></div>
+          <h3 class="category-name">Motherboards</h3>
+        </a>
+
+        <a href="products.html?cat=CCTV" class="category-card">
+          <div class="category-icon"><i class="fas fa-video"></i></div>
+          <h3 class="category-name">CCTV Cameras</h3>
+        </a>
+
+        <a href="products.html?cat=SMPS" class="category-card">
+          <div class="category-icon"><i class="fas fa-plug"></i></div>
+          <h3 class="category-name">SMPS & Power Supplies</h3>
+        </a>
+
+        <a href="products.html?cat=Keyboards" class="category-card">
+          <div class="category-icon"><i class="fas fa-keyboard"></i></div>
+          <h3 class="category-name">Keyboards & Mice</h3>
+        </a>
+
+        <a href="products.html?cat=Peripherals" class="category-card">
+          <div class="category-icon"><i class="fas fa-hdd"></i></div>
+          <h3 class="category-name">All Computer Peripherals</h3>
+        </a>
+
+        <!-- 6 Duplicated Category Cards for Infinite Seamless Loop -->
+        <a href="products.html?cat=Printers" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-print"></i></div>
+          <h3 class="category-name">Printers & Accessories</h3>
+        </a>
+
+        <a href="products.html?cat=Motherboards" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-microchip"></i></div>
+          <h3 class="category-name">Motherboards</h3>
+        </a>
+
+        <a href="products.html?cat=CCTV" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-video"></i></div>
+          <h3 class="category-name">CCTV Cameras</h3>
+        </a>
+
+        <a href="products.html?cat=SMPS" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-plug"></i></div>
+          <h3 class="category-name">SMPS & Power Supplies</h3>
+        </a>
+
+        <a href="products.html?cat=Keyboards" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-keyboard"></i></div>
+          <h3 class="category-name">Keyboards & Mice</h3>
+        </a>
+
+        <a href="products.html?cat=Peripherals" class="category-card" aria-hidden="true">
+          <div class="category-icon"><i class="fas fa-hdd"></i></div>
+          <h3 class="category-name">All Computer Peripherals</h3>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Authorized Service Center Section -->
+  <section class="section-padding brand-section">
+    <div class="container text-center">
+      <span class="section-tag" style="background: rgba(6,182,212,0.15); color: var(--accent-cyan);">Multi-Brand Service Center</span>
+      <h2 class="section-title" style="color: #FFFFFF; font-weight: 700;">Authorized Service Center</h2>
+      <p class="section-subtitle" style="color: var(--text-light);">We provide expert diagnostic repair, component replacement, and warranty support for all leading technology brands.</p>
+    </div>
+
+    <!-- Infinite Auto-Scrolling Brand Marquee -->
+    <div class="brand-marquee-wrapper">
+      <div class="brand-marquee-track" id="brandMarqueeTrack">
+        <!-- Set 1 (Original 6 Brands) -->
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-microchip"></i></div>
+            <h4>CONSISTENT</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-keyboard"></i></div>
+            <h4>FINGERS</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-palette"></i></div>
+            <h4>ARTIS</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-desktop"></i></div>
+            <h4>ZEBION</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-laptop-medical"></i></div>
+            <h4>LAPCARE</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-memory"></i></div>
+            <h4>EVM</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+
+        <!-- Set 2 (Duplicate for Seamless Infinite Scroll Loop) -->
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-microchip"></i></div>
+            <h4>CONSISTENT</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-keyboard"></i></div>
+            <h4>FINGERS</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-palette"></i></div>
+            <h4>ARTIS</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-desktop"></i></div>
+            <h4>ZEBION</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-laptop-medical"></i></div>
+            <h4>LAPCARE</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+        <div class="brand-card" aria-hidden="true">
+          <div class="brand-card-inner">
+            <div class="brand-icon-box"><i class="fas fa-memory"></i></div>
+            <h4>EVM</h4>
+            <span class="brand-badge"><i class="fas fa-check-circle"></i> Authorized / Repair</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Choose Us -->
+  <section class="section-padding">
+    <div class="container">
+      <div class="text-center">
+        <span class="section-tag" style="color: #38BDF8; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3);">Our Commitment</span>
+        <h2 class="section-title">Why Choose Gayatri Computers?</h2>
+        <p class="section-subtitle">Over 15+ years of trusted hardware service and transparent pricing in Jalgaon district.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card">
+          <div class="feature-card-icon"><i class="fas fa-bolt"></i></div>
+          <h3>Fast Express Repairs</h3>
+          <p>Quick diagnostic turnarounds with same-day resolution for software, OS formatting, RAM/SSD upgrades, and toner refilling.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3>100% Genuine Parts</h3>
+          <p>We source authentic motherboards, SMPS units, batteries, screens, and accessories directly from authorized distributors.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-icon"><i class="fas fa-tags"></i></div>
+          <h3>Best Rates in Golani Market</h3>
+          <p>Unbeatable wholesale & retail pricing for new custom PC builds, CCTV packages, and repair services with invoice guarantee.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Contact Strip -->
+  <section style="background: linear-gradient(135deg, var(--bg-slate), var(--bg-dark)); color: var(--text-white); padding: 3rem 0; border-top: 1px solid rgba(255,255,255,0.1);">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+      <div>
+        <h3 style="color: var(--text-white); font-size: 1.5rem;">Need Urgent Laptop or Printer Service?</h3>
+        <p style="color: var(--text-light);">Visit Shop No. 2, C-Wing, 2nd Floor, Golani Market, Above Lokmat Office, Jalgaon.</p>
+      </div>
+      <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+        <a href="tel:9226958825" class="btn btn-primary"><i class="fas fa-phone-alt"></i> Call 9226958825</a>
+        <a href="services.html" class="btn btn-secondary" style="border-color: var(--accent-cyan); color: var(--accent-cyan);"><i class="fas fa-tools"></i> Book Online Ticket</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo-brand" style="margin-bottom: 1rem;">
+            <div class="brand-logo-img-wrapper">
+              <img src="assets/Logo.jpeg" alt="Gayatri Computers Logo" class="brand-logo-img">
+            </div>
+            <div class="logo-text">Gayatri <span>Computers</span></div>
+          </div>
+          <p style="color: var(--text-light); font-size: 0.9rem; max-width: 320px;">
+            Your one-stop destination for laptop chip-level repairs, desktop upgrades, printers, CCTV surveillance systems, and high quality computer peripherals in Jalgaon.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="index.html">Home</a></li>
+            <li><a href="products.html">Products Catalog</a></li>
+            <li><a href="services.html">Repair Services</a></li>
+            <li><a href="track.html">Track Query / Order</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Popular Services</h4>
+          <ul class="footer-links">
+            <li><a href="services.html">Laptop Chip-Level Repair</a></li>
+            <li><a href="services.html">Printer Refill & Maintenance</a></li>
+            <li><a href="services.html">CCTV Camera Installation</a></li>
+            <li><a href="services.html">Desktop Power Supply Fixing</a></li>
+            <li><a href="services.html">Custom Gaming PC Assembly</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Business Hours</h4>
+          <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 0.5rem;">
+            <strong style="color:var(--text-white);">Monday - Saturday:</strong><br>
+            10:30 AM to 07:00 PM
+          </p>
+          <p style="font-size: 0.9rem; color: var(--text-light);">
+            <strong style="color:var(--text-white);">Sunday:</strong> Closed
+          </p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating AI Chatbot Widget -->
+  <div class="ai-chatbot-wrapper" id="aiChatbotWrapper">
+    <!-- Floating Trigger Button -->
+    <button type="button" class="chatbot-trigger-btn" id="chatbotToggleBtn" aria-label="Open AI Support Chat">
+      <div class="bot-badge-dot"></div>
+      <i class="fas fa-robot"></i>
+    </button>
+
+    <!-- Chatbot Window Panel -->
+    <div class="chatbot-panel" id="chatbotPanel" style="display: none;">
+      <!-- Panel Header -->
+      <div class="chatbot-header">
+        <div class="chatbot-header-info">
+          <div class="bot-avatar-box">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <h4 class="bot-title">Gayatri AI Support</h4>
+            <span class="bot-status"><span class="status-dot"></span> Online • Instant Answers</span>
+          </div>
+        </div>
+        <button type="button" class="btn-chat-close" id="chatbotCloseBtn" aria-label="Close Chat">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Quick Question Suggestions -->
+      <div class="chatbot-quick-chips">
+        <button type="button" class="quick-chip" onclick="handleQuickPrompt('Shop Location & Timings')">📍 Shop Location & Timing</button>
+        <button type="button" class="quick-chip" onclick="handleQuickPrompt('Repair Services Available')">🛠️ Repair Services</button>
+        <button type="button" class="quick-chip" onclick="handleQuickPrompt('Available Products')">🖥️ Products & Parts</button>
+        <button type="button" class="quick-chip" onclick="handleQuickPrompt('How to Track Order or Repair')">🔍 Track Query / Order</button>
+      </div>
+
+      <!-- Message History Area -->
+      <div class="chatbot-messages" id="chatMessagesContainer">
+        <div class="chat-msg bot-msg">
+          <div class="msg-bubble">
+            👋 <strong>नमस्कार! Welcome to Gayatri Computers.</strong><br>
+            मी तुमचा AI सहाय्यक आहे. लॅपटॉप रिपेअर, प्रिंटर सर्व्हिस, हार्डवेअर स्टॉक किंवा ऑर्डर ट्रॅकिंगबद्दल काहीही विचारा!
+          </div>
+        </div>
+      </div>
+
+      <!-- Message Input Bar -->
+      <form class="chatbot-input-bar" id="chatbotForm" onsubmit="handleChatSubmit(event)">
+        <input 
+          type="text" 
+          id="chatbotInput" 
+          class="chatbot-input" 
+          placeholder="Type question in Marathi, Hindi, or English..." 
+          autocomplete="off" 
+          required 
+        />
+        <button type="submit" class="chatbot-send-btn" aria-label="Send Message">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modular Scripts -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/chatbot.js"></script>
+</body>
+</html>

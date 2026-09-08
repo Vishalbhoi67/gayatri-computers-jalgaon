@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Browse computer hardware, printers, motherboards, CCTV cameras, SMPS power supplies, and keyboards at Gayatri Computers Jalgaon.">
+  <title>Products Catalog | Gayatri Computers Sales & Service</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/jpeg" href="assets/Logo.jpeg">
+
+  <!-- Firebase 9.23.0 Compat SDK & Firestore Storage Adapter -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+</head>
+<body>
+
+  <!-- Sticky Navbar Header -->
+  <header class="site-header">
+    <div class="container navbar">
+      <nav class="nav-menu" id="navMenu">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="products.html" class="nav-link active">Products</a>
+        <a href="services.html" class="nav-link">Services</a>
+        <a href="track.html" class="nav-link">Track Query / Order</a>
+        <a href="contact.html" class="nav-link">Contact Us</a>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="admin.html" class="admin-btn">
+          <i class="fas fa-user-shield"></i> Admin Login
+        </a>
+        <button class="mobile-toggle" id="mobileToggle" aria-label="Toggle Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Products Main Content -->
+  <section class="section-padding products-main-section" style="padding-top: 95px;">
+    <div class="container">
+      <div class="products-layout">
+        
+        <!-- Modern Glassmorphic Category Sidebar -->
+        <aside class="sidebar-category-panel">
+          <div class="sidebar-panel-header">
+            <div class="header-icon-box">
+              <i class="fas fa-filter"></i>
+            </div>
+            <h3 class="sidebar-panel-title">Filter Categories</h3>
+          </div>
+
+          <ul class="category-filter-list">
+            <li>
+              <button class="cat-filter-pill active" data-category="All">
+                <span class="cat-pill-icon all-cat"><i class="fas fa-th-large"></i></span>
+                <span class="cat-pill-text">All Categories</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="Printers & Accessories">
+                <span class="cat-pill-icon printers"><i class="fas fa-print"></i></span>
+                <span class="cat-pill-text">Printers & Accessories</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="Motherboards">
+                <span class="cat-pill-icon motherboards"><i class="fas fa-microchip"></i></span>
+                <span class="cat-pill-text">Motherboards</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="CCTV Cameras">
+                <span class="cat-pill-icon cctv"><i class="fas fa-video"></i></span>
+                <span class="cat-pill-text">CCTV Cameras</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="SMPS & Power Supplies">
+                <span class="cat-pill-icon smps"><i class="fas fa-plug"></i></span>
+                <span class="cat-pill-text">SMPS & Power Supplies</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="Keyboards & Mice">
+                <span class="cat-pill-icon keyboards"><i class="fas fa-keyboard"></i></span>
+                <span class="cat-pill-text">Keyboards & Mice</span>
+              </button>
+            </li>
+            <li>
+              <button class="cat-filter-pill" data-category="All Computer Peripherals">
+                <span class="cat-pill-icon peripherals"><i class="fas fa-hdd"></i></span>
+                <span class="cat-pill-text">All Computer Peripherals</span>
+              </button>
+            </li>
+          </ul>
+        </aside>
+
+        <!-- Main Product Area -->
+        <main>
+          <!-- Mobile & Desktop Unified Filter Toolbar -->
+          <div class="products-toolbar">
+            <!-- Category Dropdown Select (Visible on Mobile) -->
+            <div class="category-select-wrapper">
+              <select id="mobileCategorySelect" class="form-control category-dropdown-mobile" onchange="const val=this.value; document.querySelectorAll('.cat-filter-pill').forEach(b => { if(b.dataset.category===val) b.click(); });">
+                <option value="All">📁 All Categories</option>
+                <option value="Printers & Accessories">🖨️ Printers & Accessories</option>
+                <option value="Motherboards">⚡ Motherboards</option>
+                <option value="CCTV Cameras">📹 CCTV Cameras</option>
+                <option value="SMPS & Power Supplies">🔌 SMPS & Power Supplies</option>
+                <option value="Keyboards & Mice">⌨️ Keyboards & Mice</option>
+                <option value="All Computer Peripherals">💾 All Computer Peripherals</option>
+              </select>
+            </div>
+
+            <!-- Search Bar with Icon -->
+            <div class="search-bar">
+              <input type="text" id="searchInput" class="search-input" placeholder="Search product..." />
+              <button type="button" class="btn btn-primary search-btn" aria-label="Search">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="product-grid" id="productGrid">
+            <!-- Dynamic products rendered by js/products.js -->
+          </div>
+        </main>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Purchase Inquiry Modal -->
+  <div class="modal-backdrop" id="purchaseModal" style="display: none;" onclick="if(event.target === this) { window.closePurchaseModal(); }">
+    <div class="modal-box purchase-modal-content" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title"><i class="fas fa-shopping-cart"></i> Submit Purchase Inquiry</h3>
+        <button type="button" class="modal-close" onclick="window.closePurchaseModal(event)"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="selected-product-box">
+          <h4 id="modalProdTitle">Selected Item</h4>
+          <span id="modalProdPrice">₹0</span>
+        </div>
+
+        <form id="purchaseForm">
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="custName">Your Full Name *</label>
+            <input type="text" id="custName" class="form-control" placeholder="e.g. Rajesh Patil" required />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="custPhone">Mobile Number *</label>
+            <input type="tel" id="custPhone" class="form-control" placeholder="e.g. 9823012345" required />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="inquiry-email">Email Address (Optional / For Receipt)</label>
+            <input type="email" id="inquiry-email" class="form-control" placeholder="e.g. customer@gmail.com" />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.25rem;">
+            <label class="form-label" for="custAddress">Delivery / Pickup Address *</label>
+            <input type="text" id="custAddress" class="form-control" placeholder="e.g. Plot 14, Ring Road, Jalgaon" required />
+          </div>
+
+          <div class="form-group" style="margin-bottom: 1.5rem;">
+            <label class="form-label" for="custNotes">Additional Notes / Quantity</label>
+            <textarea id="custNotes" class="form-control" rows="3" placeholder="Mention preferred quantity or inquiry questions..."></textarea>
+          </div>
+
+          <div style="display: flex; gap: 0.75rem; justify-content: flex-end;">
+            <button type="button" class="btn btn-cancel-inquiry" id="cancelPurchaseBtn" onclick="window.closePurchaseModal(event)">Cancel</button>
+            <button type="submit" class="btn btn-submit-inquiry"><i class="fas fa-paper-plane"></i> Submit Request</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Purchase Inquiry Success Confirmation Modal -->
+  <div class="modal-backdrop" id="inquiry-success-modal" style="display: none;" onclick="if(event.target === this) { window.closeSuccessModal(); }">
+    <div class="modal-box" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title" style="color: #4ADE80 !important;"><i class="fas fa-check-circle"></i> Purchase Inquiry Registered!</h3>
+        <button type="button" class="modal-close" id="close-success-modal-btn" onclick="window.closeSuccessModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body text-center">
+        <p style="color: #CBD5E1; font-size: 0.85rem; line-height: 1.4; margin-bottom: 0.85rem;">
+          Your order inquiry has been logged successfully at Gayatri Computers.
+        </p>
+
+        <!-- Digital Ticket Coupon Box -->
+        <div class="digital-ticket-box">
+          <span>UNIQUE ORDER / INQUIRY ID</span>
+          <h2 id="success-ref-id">REQ-0000</h2>
+          <button type="button" id="copy-ref-id-btn" class="btn btn-secondary btn-sm">
+            <i class="fas fa-copy"></i> Copy Inquiry ID
+          </button>
+        </div>
+
+        <!-- Order Summary Details Card -->
+        <div class="inquiry-summary-card">
+          <p><strong>Customer:</strong> <span id="inquiryCustName">---</span></p>
+          <p><strong>Product:</strong> <span id="inquiryProdTitle">---</span></p>
+          <p><strong>Price:</strong> <span id="inquiryProdPrice" style="color: #38BDF8; font-weight: 700;">---</span></p>
+        </div>
+
+        <!-- Action Button -->
+        <div style="display: flex; width: 100%;">
+          <a href="track.html" id="trackOrderBtn" class="btn btn-primary btn-full">
+            <i class="fas fa-search"></i> Track Order Status Now
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/products.js"></script>
+</body>
+</html>

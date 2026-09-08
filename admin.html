@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Admin Portal - Gayatri Computers Sales & Service Jalgaon">
+  <title>Admin Portal | Gayatri Computers</title>
+
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/jpeg" href="assets/Logo.jpeg">
+
+  <!-- Firebase 9.23.0 Compat SDK & Firestore Storage Adapter -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="js/firebase-config.js"></script>
+
+  <!-- Prevent FOUC / Page Refresh Flicker on Admin Portal -->
+  <script>
+    (function() {
+      try {
+        var hasSession = (localStorage.getItem("gc_admin_session") === "true") || 
+                         (localStorage.getItem("adminLoggedIn") === "true") || 
+                         (sessionStorage.getItem("gc_admin_session") === "true") ||
+                         (sessionStorage.getItem("gc_admin_logged_in") === "true");
+        if (hasSession) {
+          document.documentElement.classList.add("admin-session-active");
+        }
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body id="adminApp">
+
+  <!-- Admin Header Bar (Hidden by default until logged in) -->
+  <header class="site-header" id="adminHeaderBar" style="display: none;">
+    <div class="container navbar" style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 1rem;">
+        <button id="adminSidebarToggle" class="sidebar-toggle-btn" aria-label="Toggle Navigation Menu">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="index.html" class="logo-brand" style="color: #FFFFFF; font-size: 1.35rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; text-decoration: none;">
+          <span id="admin-current-page-title" style="color: #FFFFFF; font-weight: 700; font-size: 1.35rem;">Dashboard</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sidebar Navigation Drawer & Backdrop Overlay -->
+  <div class="sidebar-backdrop" id="adminSidebarBackdrop"></div>
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="sidebar-header">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <div class="logo-icon" style="width: 38px; height: 38px; font-size: 1.1rem; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));"><i class="fas fa-user-shield"></i></div>
+        <span style="color: #FFFFFF; font-weight: 700; font-size: 1.1rem;">Admin Navigation</span>
+      </div>
+      <button class="sidebar-close-btn" id="adminSidebarClose"><i class="fas fa-times"></i></button>
+    </div>
+
+    <nav class="sidebar-menu">
+      <button class="sidebar-item active" data-tab="tabOverview">
+        <i class="fas fa-chart-pie sidebar-icon"></i>
+        <span>Dashboard Overview</span>
+      </button>
+
+      <button class="sidebar-item" data-tab="tabServices">
+        <i class="fas fa-tools sidebar-icon"></i>
+        <span>Service Queries</span>
+      </button>
+
+      <button class="sidebar-item" data-tab="tabPurchases">
+        <i class="fas fa-shopping-cart sidebar-icon"></i>
+        <span>Purchase Requests</span>
+      </button>
+
+      <button class="sidebar-item" data-tab="tabProducts">
+        <i class="fas fa-boxes sidebar-icon"></i>
+        <span>Manage Products</span>
+      </button>
+
+      <!-- NEW: Developer Info Menu Item -->
+      <button class="sidebar-item" data-tab="tabDeveloper">
+        <i class="fas fa-code sidebar-icon"></i>
+        <span>Developer Info</span>
+      </button>
+
+      <button id="sidebarLogoutBtn" class="sidebar-item sidebar-logout-btn">
+        <i class="fas fa-sign-out-alt sidebar-icon"></i>
+        <span>Logout</span>
+      </button>
+    </nav>
+  </aside>
+
+  <!-- 1. LOGIN FORM WRAPPER WITH TOP-RIGHT "GO TO HOME" BUTTON -->
+  <div id="adminLoginSection" class="admin-login-wrapper" style="display: none;">
+    
+    <!-- Fixed Top-Right "Go to Home" Button -->
+    <div style="position: fixed; top: 1.25rem; right: 1.5rem; z-index: 9999;">
+      <a href="index.html" class="btn" style="background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(56, 189, 248, 0.35); color: #38BDF8; padding: 0.55rem 1.15rem; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; gap: 0.45rem; transition: all 0.25s ease; backdrop-filter: blur(10px); box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+        <i class="fas fa-arrow-left"></i> Go to Home
+      </a>
+    </div>
+
+    <div id="adminLoginCard" class="form-card admin-login-card login-card">
+      <div class="text-center" style="margin-bottom: 1.75rem;">
+        <div class="logo-icon" style="margin: 0 auto 1rem auto; width: 54px; height: 54px; font-size: 1.5rem; background: linear-gradient(135deg, var(--primary-blue), var(--accent-cyan));"><i class="fas fa-lock"></i></div>
+        <h2 style="font-size: 1.5rem; color: #FFFFFF;">Admin Authentication</h2>
+        <p style="font-size: 0.85rem; color: #94A3B8; margin-top: 0.25rem;">Sign in to access repair jobs & inventory dashboard</p>
+      </div>
+
+      <form id="adminLoginForm">
+        <div class="form-group">
+          <label class="form-label" for="adminEmail">Admin Email / Username</label>
+          <input type="email" id="adminEmail" class="form-control" placeholder="Enter Admin Email" required />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="adminPassword">Password</label>
+          <input type="password" id="adminPassword" class="form-control" placeholder="Enter Password" required />
+        </div>
+
+        <button type="submit" id="adminLoginSubmitBtn" class="btn btn-primary btn-full" style="padding: 0.8rem; font-size: 1rem; margin-top: 0.5rem; transition: all 0.3s ease;">
+          <i class="fas fa-sign-in-alt"></i> Login to Dashboard
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 2. PROTECTED DASHBOARD VIEW -->
+  <section class="admin-container" id="dashboard-container" style="display: none; padding-top: 80px; min-height: 85vh;">
+    <div class="container admin-dashboard" style="padding-top: 1rem; padding-bottom: 3rem; color: #FFFFFF;">
+      <div id="adminDashboardView">
+
+        <!-- VIEW 1: DASHBOARD OVERVIEW -->
+        <div id="tabOverview" class="admin-tab-content" style="display: block;">
+          <!-- Stats Cards Grid -->
+          <div class="feature-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.25rem; margin-top: 0.5rem; margin-bottom: 1.75rem;">
+            <div class="feature-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px;">
+              <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Total Inventory Items</span>
+              <h2 id="statProductsCount" style="font-size: 2.25rem; color: #38BDF8; margin-top: 0.25rem;">0</h2>
+            </div>
+
+            <div class="feature-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 14px;">
+              <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Pending Sales Leads</span>
+              <h2 id="statPendingRequests" style="font-size: 2.25rem; color: #F59E0B; margin-top: 0.25rem;">0</h2>
+            </div>
+
+            <div class="feature-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px;">
+              <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Active Repair Jobs</span>
+              <h2 id="statActiveRepairs" style="font-size: 2.25rem; color: #38BDF8; margin-top: 0.25rem;">0</h2>
+            </div>
+
+            <div class="feature-card" style="padding: 1.5rem; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 14px;">
+              <span style="font-size: 0.8rem; color: #94A3B8; font-weight: 600; text-transform: uppercase;">Completed Jobs</span>
+              <h2 id="statCompletedJobs" style="font-size: 2.25rem; color: #10B981; margin-top: 0.25rem;">0</h2>
+            </div>
+          </div>
+
+          <!-- Analytics Grid: Left (Bar Chart) | Right (Category Stock Breakdown) -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+            
+            <!-- Left Column: Service vs Sales Bar Chart -->
+            <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px; padding: 1.5rem; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.1rem; color: #FFFFFF; font-weight: 600;">
+                    <i class="fas fa-chart-bar" style="color: #38BDF8; margin-right: 0.4rem;"></i> Monthly Service vs Sales
+                  </h4>
+                  <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: #94A3B8;">Volume comparison for active repairs & purchases</p>
+                </div>
+              </div>
+              <div style="position: relative; height: 260px; width: 100%;">
+                <canvas id="serviceSalesChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Right Column: Category-wise Stock Breakdown -->
+            <div style="background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(56, 189, 248, 0.2); border-radius: 14px; padding: 1.5rem; display: flex; flex-direction: column;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <div>
+                  <h4 style="margin: 0; font-size: 1.1rem; color: #FFFFFF; font-weight: 600;">
+                    <i class="fas fa-boxes" style="color: #10B981; margin-right: 0.4rem;"></i> Category Stock Breakdown
+                  </h4>
+                  <p style="margin: 0.2rem 0 0 0; font-size: 0.8rem; color: #94A3B8;">Live count of hardware items by department</p>
+                </div>
+              </div>
+
+              <div id="categoryStockList" style="display: flex; flex-direction: column; gap: 0.75rem; overflow-y: auto; max-height: 260px;">
+                <!-- Dynamically rendered categories -->
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- VIEW 2: SERVICE QUERIES & REPAIR JOBS -->
+        <div id="tabServices" class="admin-tab-content" style="display: none;">
+          <!-- Service Queries Header & Search Bar -->
+          <div class="admin-tab-header-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+            <div>
+              <h3 style="margin: 0; font-size: 1.2rem; color: #FFFFFF; font-weight: 600;">Service Queries List</h3>
+              <p style="margin: 0.2rem 0 0 0; font-size: 0.82rem; color: #94A3B8;">Filter tickets by Query ID, Customer Name, or Phone number</p>
+            </div>
+
+            <!-- Glassmorphic Search Box -->
+            <div class="admin-search-box-wrapper" style="position: relative; min-width: 280px; max-width: 380px; width: 100%;">
+              <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748B; font-size: 0.9rem; pointer-events: none;"></i>
+              <input 
+                type="text" 
+                id="serviceSearchInput" 
+                class="form-control" 
+                placeholder="Search Query ID, Name, Phone..." 
+                oninput="handleServiceSearch(this.value)"
+                style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.4rem; background: #0F172A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; color: #FFFFFF; font-size: 0.88rem; outline: none; transition: border-color 0.2s ease;"
+              />
+            </div>
+          </div>
+
+          <div class="data-table-wrapper" style="margin-top: 0.5rem;">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Query ID</th>
+                  <th>Customer Info</th>
+                  <th>Device / Issue</th>
+                  <th>Status Updater</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminServiceTableBody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 3: PURCHASE REQUESTS -->
+<div id="tabPurchases" class="admin-tab-content" style="display: none;">
+  <!-- Header Controls with Search -->
+  <div class="admin-tab-header-controls" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <h3 style="margin: 0; font-size: 1.2rem; color: #FFFFFF; font-weight: 600;">Purchase Requests List</h3>
+      <p style="margin: 0.2rem 0 0 0; font-size: 0.82rem; color: #94A3B8;">Search inquiries by Req ID, Customer Name, Phone, or Inquired Product</p>
+    </div>
+
+    <!-- Glassmorphic Search Box -->
+    <div class="admin-search-box-wrapper" style="position: relative; min-width: 280px; max-width: 360px; width: 100%;">
+      <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #64748B; font-size: 0.9rem; pointer-events: none;"></i>
+      <input 
+        type="text" 
+        id="purchaseSearchInput" 
+        class="form-control" 
+        placeholder="Search Req ID, Name, Phone, Product..." 
+        oninput="handlePurchaseSearch(this.value)"
+        style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.4rem; background: #0F172A; border: 1px solid rgba(56, 189, 248, 0.25); border-radius: 8px; color: #FFFFFF; font-size: 0.88rem; outline: none;"
+      />
+    </div>
+  </div>
+
+  <!-- Perfectly Fitted Full-Width Data Table (No Horizontal Scroll) -->
+  <div class="data-table-wrapper" style="width: 100%; margin-top: 0.5rem; overflow: hidden; box-sizing: border-box;">
+    <table class="data-table" style="width: 100%; table-layout: auto; border-collapse: collapse;">
+      <thead>
+        <tr>
+          <th style="padding: 0.9rem 1rem;">Req ID</th>
+          <th style="padding: 0.9rem 1rem;">Customer Details</th>
+          <th style="padding: 0.9rem 1rem;">Inquired Product</th>
+          <th style="padding: 0.9rem 1rem;">Price</th>
+          <th style="padding: 0.9rem 1rem;">Status Updater</th>
+          <th style="padding: 0.9rem 1rem; text-align: center;">Action</th>
+        </tr>
+      </thead>
+      <tbody id="adminPurchaseTableBody">
+        <!-- Dynamically rendered -->
+      </tbody>
+    </table>
+  </div>
+</div>
+
+        <!-- VIEW 4: PRODUCT MANAGER -->
+        <div id="tabProducts" class="admin-tab-content" style="display: none;">
+          <div style="margin-top: 0.5rem; margin-bottom: 1.25rem;">
+            <button id="btn-open-add-product-modal" class="btn" style="background: linear-gradient(135deg, #0EA5E9, #2563EB); color: #FFFFFF; border-radius: 8px; font-weight: 600; padding: 0.65rem 1.35rem; cursor: pointer; border: none; display: inline-flex; align-items: center; gap: 0.5rem; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);">
+              <i class="fas fa-plus"></i> Add New Product
+            </button>
+          </div>
+
+          <!-- Full Width Existing Products Table -->
+          <div class="data-table-wrapper" style="width: 100%; overflow-x: auto;">
+            <table class="data-table" style="width: 100%; table-layout: auto;">
+              <thead>
+                <tr>
+                  <th style="width: 10%;">Img</th>
+                  <th style="width: 25%;">Product Title</th>
+                  <th style="width: 20%;">Category</th>
+                  <th style="width: 15%;">Price</th>
+                  <th style="width: 15%;">Stock Qty</th>
+                  <th style="width: 15%; text-align: center;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="adminProductsTableBody">
+                <!-- Dynamically rendered -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- VIEW 5: DEVELOPER & FOUNDER INFO -->
+        <div id="tabDeveloper" class="admin-tab-content" style="display: none;">
+          <div style="margin-bottom: 1.75rem;">
+            <h3 style="margin: 0; font-size: 1.3rem; color: #FFFFFF; font-weight: 700;">Developer & Core Team</h3>
+            <p style="margin: 0.25rem 0 0 0; font-size: 0.88rem; color: #94A3B8;">Contact details of the engineering and core founding team of Gayatri Computers Portal</p>
+          </div>
+
+          <!-- Left-Aligned Spacious 3D Flip Card -->
+          <div class="developer-flip-wrapper" style="max-width: 580px; width: 100%; margin: 0; perspective: 1000px;">
+            <div class="flip-card-inner" id="devFlipCard" style="position: relative; width: 100%; min-height: 380px; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d;">
+              
+              <!-- FRONT SIDE: Co-Founder Sourabh Shimpi -->
+              <div class="flip-card-front" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid rgba(16, 185, 129, 0.35); border-radius: 18px; padding: 1.85rem; box-shadow: 0 12px 35px rgba(0,0,0,0.55); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                
+                <div>
+                  <!-- Header with Top-Right Flip Trigger -->
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.35rem;">
+                    <div style="display: flex; align-items: center; gap: 1.15rem;">
+                      <div class="dev-avatar-wrapper founder-avatar" style="width: 65px; height: 65px; border-radius: 14px; border: 2px solid #10B981; padding: 2px; background: rgba(16, 185, 129, 0.1); box-shadow: 0 0 12px rgba(16, 185, 129, 0.25);">
+                        <img src="assets/Passport2.png" alt="Sourabh Shimpi - Co-Founder" class="dev-avatar-img founder-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.onerror=null; this.src='assets/Logo.jpeg';" />
+                      </div>
+                      <div>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #34D399; text-transform: uppercase; letter-spacing: 0.06em; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 0.22rem 0.6rem; border-radius: 6px;">Executive Core</span>
+                        <h4 style="margin: 0.3rem 0 0 0; font-size: 1.35rem; color: #FFFFFF; font-weight: 700;">Sourabh Shimpi</h4>
+                        <p style="margin: 0.1rem 0 0 0; font-size: 0.88rem; color: #94A3B8;">Co-Founder</p>
+                      </div>
+                    </div>
+
+                    <button type="button" class="flip-btn" onclick="document.getElementById('devFlipCard').style.transform='rotateY(180deg)'" title="View Developer Info" style="background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.4); color: #38BDF8; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem; transition: all 0.2s ease;">
+                      <i class="fas fa-code"></i> Dev Info
+                    </button>
+                  </div>
+
+                  <!-- Contact Details -->
+                  <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.15rem; margin-bottom: 1.35rem; display: flex; flex-direction: column; gap: 0.9rem;">
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                      <div style="width: 36px; height: 36px; border-radius: 9px; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 0.95rem;">
+                        <i class="fas fa-phone-alt"></i>
+                      </div>
+                      <div>
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 500;">Contact Number</div>
+                        <a href="tel:8010391286" style="color: #FFFFFF; font-weight: 600; font-size: 0.95rem; text-decoration: none;">+91 8010391286</a>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                      <div style="width: 36px; height: 36px; border-radius: 9px; background: rgba(16, 185, 129, 0.12); display: flex; align-items: center; justify-content: center; color: #34D399; font-size: 0.95rem;">
+                        <i class="fas fa-briefcase"></i>
+                      </div>
+                      <div>
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 500;">Role</div>
+                        <span style="color: #FFFFFF; font-weight: 600; font-size: 0.92rem;">Management & Development</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.75rem;">
+                  <a href="tel:8010391286" style="flex: 1; text-align: center; background: linear-gradient(135deg, #10B981, #059669); color: #FFFFFF; padding: 0.65rem 0.9rem; border-radius: 9px; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                    <i class="fas fa-phone-alt"></i> Call
+                  </a>
+                  <a href="https://wa.me/918010391286" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34D399; padding: 0.65rem 0.9rem; border-radius: 9px; font-weight: 600; font-size: 0.88rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                  </a>
+                </div>
+              </div>
+
+              <!-- BACK SIDE: Senior Developer Vishal Bhoi -->
+              <div class="flip-card-back" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; backface-visibility: hidden; transform: rotateY(180deg); background: linear-gradient(145deg, rgba(17, 24, 39, 0.95), rgba(15, 23, 42, 0.98)); border: 1px solid rgba(56, 189, 248, 0.35); border-radius: 18px; padding: 1.85rem; box-shadow: 0 12px 35px rgba(0,0,0,0.55); display: flex; flex-direction: column; justify-content: space-between; box-sizing: border-box;">
+                
+                <div>
+                  <!-- Header with Top-Right Back Trigger -->
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.35rem;">
+                    <div style="display: flex; align-items: center; gap: 1.15rem;">
+                      <div class="dev-avatar-wrapper" style="width: 65px; height: 65px; border-radius: 14px; border: 2px solid #38BDF8; padding: 2px; background: rgba(56, 189, 248, 0.1); box-shadow: 0 0 12px rgba(56, 189, 248, 0.25);">
+                        <img src="assets/Passport.jpg" alt="Vishal Bhoi - Senior Developer" class="dev-avatar-img" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.onerror=null; this.src='assets/Logo.jpeg';" />
+                      </div>
+                      <div>
+                        <span style="font-size: 0.72rem; font-weight: 700; color: #38BDF8; text-transform: uppercase; letter-spacing: 0.06em; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); padding: 0.22rem 0.6rem; border-radius: 6px;">Lead Engineer</span>
+                        <h4 style="margin: 0.3rem 0 0 0; font-size: 1.35rem; color: #FFFFFF; font-weight: 700;">Vishal Bhoi</h4>
+                        <p style="margin: 0.1rem 0 0 0; font-size: 0.88rem; color: #94A3B8;">Senior Developer</p>
+                      </div>
+                    </div>
+
+                    <button type="button" class="flip-btn" onclick="document.getElementById('devFlipCard').style.transform='rotateY(0deg)'" title="Back" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #CBD5E1; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.8rem; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;">
+                      <i class="fas fa-undo"></i> Back
+                    </button>
+                  </div>
+
+                  <!-- Contact Details -->
+                  <div style="border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 1.15rem; margin-bottom: 1.35rem; display: flex; flex-direction: column; gap: 0.9rem;">
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                      <div style="width: 36px; height: 36px; border-radius: 9px; background: rgba(56, 189, 248, 0.12); display: flex; align-items: center; justify-content: center; color: #38BDF8; font-size: 0.95rem;">
+                        <i class="fas fa-phone-alt"></i>
+                      </div>
+                      <div>
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 500;">Contact Number</div>
+                        <a href="tel:9765776842" style="color: #FFFFFF; font-weight: 600; font-size: 0.95rem; text-decoration: none;">+91 9765776842</a>
+                      </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 0.85rem;">
+                      <div style="width: 36px; height: 36px; border-radius: 9px; background: rgba(56, 189, 248, 0.12); display: flex; align-items: center; justify-content: center; color: #38BDF8; font-size: 0.95rem;">
+                        <i class="fas fa-envelope"></i>
+                      </div>
+                      <div>
+                        <div style="font-size: 0.75rem; color: #94A3B8; font-weight: 500;">Email Address</div>
+                        <a href="mailto:bhoivishal67@gmail.com" style="color: #FFFFFF; font-weight: 600; font-size: 0.92rem; text-decoration: none;">bhoivishal67@gmail.com</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div style="display: flex; gap: 0.65rem;">
+                  <a href="tel:9765776842" style="flex: 1; text-align: center; background: linear-gradient(135deg, #0EA5E9, #2563EB); color: #FFFFFF; padding: 0.65rem 0.8rem; border-radius: 9px; font-weight: 600; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);">
+                    <i class="fas fa-phone-alt"></i> Call
+                  </a>
+                  <a href="https://wa.me/919765776842" target="_blank" rel="noopener noreferrer" style="flex: 1; text-align: center; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.4); color: #34D399; padding: 0.65rem 0.8rem; border-radius: 9px; font-weight: 600; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                    <i class="fab fa-whatsapp"></i> WhatsApp
+                  </a>
+                  <a href="mailto:bhoivishal67@gmail.com" style="flex: 1; text-align: center; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.15); color: #CBD5E1; padding: 0.65rem 0.8rem; border-radius: 9px; font-weight: 600; font-size: 0.86rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem;">
+                    <i class="fas fa-envelope"></i> Mail
+                  </a>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </section>
+
+  <!-- Professional Glassmorphic Add Product Modal -->
+  <div class="modal-backdrop" id="add-product-modal" style="display: none;" onclick="if(event.target === this) { this.style.display='none'; }">
+    <div class="modal-card-premium" onclick="event.stopPropagation()">
+      <!-- Modal Header -->
+      <div class="modal-header-premium">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge">
+            <i class="fas fa-plus"></i>
+          </div>
+          <div>
+            <h3>Add New Product</h3>
+            <p>Add a new item to inventory with specifications, pricing, and image</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-add-product-modal" onclick="document.getElementById('add-product-modal').style.display='none'">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="addNewProductForm" class="modal-form-body">
+        <div class="form-grid-2col">
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="newProdTitle">Product Title <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-box-open input-icon"></i>
+              <input type="text" id="newProdTitle" class="form-control-premium" placeholder="e.g. Logitech Wireless Mouse" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-premium" for="newProdCategory">Category <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-th-large input-icon"></i>
+              <select id="newProdCategory" class="form-control-premium select-dark">
+                <option value="Printers & Accessories">Printers & Accessories</option>
+                <option value="Motherboards">Motherboards</option>
+                <option value="CCTV Cameras">CCTV Cameras</option>
+                <option value="SMPS & Power Supplies">SMPS & Power Supplies</option>
+                <option value="Keyboards & Mice">Keyboards & Mice</option>
+                <option value="All Computer Peripherals">All Computer Peripherals</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-premium" for="newProdPrice">Price (₹ INR) <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-rupee-sign input-icon"></i>
+              <input type="number" id="newProdPrice" class="form-control-premium" placeholder="e.g. 1450" required />
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="newProdStock">Available Stock Quantity (Units) <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-cubes input-icon"></i>
+              <input type="number" id="newProdStock" class="form-control-premium" placeholder="e.g. 10" min="0" value="1" required />
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="newProdImg">Image URL / Local Asset Path</label>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <div class="input-with-icon" style="flex: 1;">
+                <i class="fas fa-image input-icon"></i>
+                <input type="text" id="newProdImg" class="form-control-premium" placeholder="assets/hero_banner.jpg or https://..." oninput="if(typeof updateAddImagePreview === 'function') updateAddImagePreview(this.value)" />
+              </div>
+              <div class="image-preview-wrapper" id="newProdImgPreviewWrapper" style="display: none;">
+                <img id="newProdImgPreview" src="" alt="Preview" onerror="this.parentElement.style.display='none'" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="newProdDesc">Technical Description / Specs</label>
+            <textarea id="newProdDesc" class="form-control-premium" rows="3" placeholder="Enter key features, warranty, compatibility notes..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer-premium">
+          <button type="button" class="btn-cancel-glass" id="btn-cancel-add-product-modal" onclick="document.getElementById('add-product-modal').style.display='none'">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="submit" class="btn-save-glow">
+            <i class="fas fa-plus"></i> Add Product
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Professional Glassmorphic Edit Product Modal -->
+  <div class="modal-backdrop" id="edit-product-modal" style="display: none;">
+    <div class="modal-card-premium" id="editModalCard">
+      <!-- Modal Header -->
+      <div class="modal-header-premium">
+        <div class="modal-title-group">
+          <div class="modal-icon-badge">
+            <i class="fas fa-edit"></i>
+          </div>
+          <div>
+            <h3>Edit Product Details</h3>
+            <p>Update inventory item specifications, pricing, and media</p>
+          </div>
+        </div>
+        <button type="button" class="btn-modal-close" id="btnCloseEditModal" onclick="window.closeEditProductModal(event)">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Modal Form -->
+      <form id="editProductForm" onsubmit="window.handleEditProductSubmit(event)" class="modal-form-body">
+        <input type="hidden" id="editProdId" />
+
+        <div class="form-grid-2col">
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="editProdTitle">Product Title <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-box-open input-icon"></i>
+              <input type="text" id="editProdTitle" class="form-control-premium" placeholder="Product Title" required />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-premium" for="editProdCategory">Category <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-th-large input-icon"></i>
+              <select id="editProdCategory" class="form-control-premium select-dark">
+                <option value="Printers & Accessories">Printers & Accessories</option>
+                <option value="Motherboards">Motherboards</option>
+                <option value="CCTV Cameras">CCTV Cameras</option>
+                <option value="SMPS & Power Supplies">SMPS & Power Supplies</option>
+                <option value="Keyboards & Mice">Keyboards & Mice</option>
+                <option value="All Computer Peripherals">All Computer Peripherals</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-premium" for="editProdPrice">Price (₹ INR) <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-rupee-sign input-icon"></i>
+              <input type="number" id="editProdPrice" class="form-control-premium" placeholder="e.g. 4500" required />
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="editProdStock">Available Stock Quantity (Units) <span class="req-star">*</span></label>
+            <div class="input-with-icon">
+              <i class="fas fa-cubes input-icon"></i>
+              <input type="number" id="editProdStock" class="form-control-premium" placeholder="e.g. 10" min="0" required />
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="editProdImg">Image URL / Local Asset Path</label>
+            <div style="display: flex; gap: 0.75rem; align-items: center;">
+              <div class="input-with-icon" style="flex: 1;">
+                <i class="fas fa-image input-icon"></i>
+                <input type="text" id="editProdImg" class="form-control-premium" placeholder="assets/cat_motherboard.jpg or https://..." oninput="window.updateEditImagePreview(this.value)" />
+              </div>
+              <div class="image-preview-wrapper" id="editProdImgPreviewWrapper" style="display: none;">
+                <img id="editProdImgPreview" src="" alt="Preview" onerror="this.parentElement.style.display='none'" />
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group span-2">
+            <label class="form-label-premium" for="editProdDesc">Technical Description / Specs</label>
+            <textarea id="editProdDesc" class="form-control-premium" rows="3" placeholder="Enter key features, warranty..."></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer-premium">
+          <button type="button" class="btn-cancel-glass" id="btnCancelEditModal" onclick="window.closeEditProductModal(event)">
+            <i class="fas fa-times"></i> Cancel
+          </button>
+          <button type="submit" class="btn-save-glow">
+            <i class="fas fa-save"></i> Save Product Changes
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Custom Logout Confirmation Modal -->
+  <div class="modal-backdrop" id="logoutModal" style="display: none;" onclick="if(event.target === this) { window.closeLogoutModal(); }">
+    <div class="logout-modal-content" onclick="event.stopPropagation()">
+      <div style="font-size: 2.5rem; color: #F87171; margin-bottom: 1rem;">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3 style="font-size: 1.5rem; color: #FFFFFF; margin-bottom: 0.75rem; font-weight: 700;">Confirm Logout</h3>
+      <p style="color: #94A3B8; font-size: 0.95rem; margin-bottom: 1.75rem; max-width: 380px; margin-left: auto; margin-right: auto; line-height: 1.5;">
+        Are you sure you want to log out of the Gayatri Computers Admin Portal?
+      </p>
+      <div style="display: flex; gap: 1rem; justify-content: center;">
+        <button type="button" class="btn btn-modal-cancel" id="cancelLogoutBtn" onclick="window.closeLogoutModal()">Cancel</button>
+        <button type="button" class="btn btn-modal-confirm" id="confirmLogoutBtn" onclick="window.executeLogout()">Yes, Logout</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/seed-data.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>
